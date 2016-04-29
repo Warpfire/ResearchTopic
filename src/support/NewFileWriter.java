@@ -1,8 +1,9 @@
 package support;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 /**
  * Class which contains a Static method for printing a string to a new file located in C:\Temp\
@@ -15,20 +16,19 @@ public class NewFileWriter {
 		 * @param fileName Name of the file that should be created. This file is located in C:\Temp\
 	 */
 	public static void writeFile(String string,String fileName){
-		
-		BufferedWriter writer = null;
-		
+		Writer out = null;
 		try{
-		File file = new File("C:\\Temp\\"+fileName);
-		writer = new BufferedWriter(new FileWriter(file));
-		writer.write(string);}
+			out = new BufferedWriter(new OutputStreamWriter(
+				    new FileOutputStream("C:\\Temp\\"+fileName), "UTF-8"));
+
+			out.write(string);}
 		catch (Exception e) {
             e.printStackTrace();
         }
 		finally {
             try {
                 // Close the writer regardless of what happens...
-                writer.close();
+            	out.close();
             } catch (Exception e) {
             }
 	}}

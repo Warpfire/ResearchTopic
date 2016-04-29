@@ -43,13 +43,13 @@ public class FetchProductListingFromSearch {
 	        url = new URL("http://simplybearings.co.uk/shop/product_listing_search_ajax.php?dd_data=&keywords="+keyword);
 	        is = url.openStream();  // throws an IOException
 	        br = new BufferedReader(new InputStreamReader(is));
-	        
 	        while ((line = br.readLine()) != null) {
 	            if(line.contains("product_info.html")){
 	            	line = line.replace('"', ' ');
 	            	String[] words = line.split(" ");
 	            	for(int i=0;i<words.length;i++){
 	            		if (words[i].contains("product_info.html"))
+	            			//System.out.println(words[i]);
 	            			foundURLs.add(words[i]);
 	            			
 	            	}
@@ -163,16 +163,16 @@ public class FetchProductListingFromSearch {
 		while(resultSet.hasNext()){
 			Entry<String, String> result = resultSet.next();
 			String key = result.getKey();
-			switch (key){
+			switch (key.replaceAll("\\s","")){
 				case "DESC_EN" : key = "DESC2_EN"; break;
 				case "d" : key = "Inside Diameter"; break;
-				case "Inside Dia d" : key = "Inside Diameter"; break;
-				case "Inside Diameter d" : key = "Inside Diameter"; break;
+				case "InsideDiad" : key = "Inside Diameter"; break;
+				case "InsideDiameterd" : key = "Inside Diameter"; break;
 				case "D" : key = "Outside Diameter"; break;
-				case "Outside Diameter D" : key = "Outside Diameter"; break;
+				case "OutsideDiameterD" : key = "Outside Diameter"; break;
 				case "B" : key = "Width"; break;
-				case "Width B" : key = "Width"; break;
-				case "Width W" : key = "Width"; break;
+				case "WidthB" : key = "Width"; break;
+				case "WidthW" : key = "Width"; break;
 				case "kg" : key = "Weight"; break;
 			}
 			String value = result.getValue();
