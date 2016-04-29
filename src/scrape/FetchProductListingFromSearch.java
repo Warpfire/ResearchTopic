@@ -17,7 +17,7 @@ import org.jsoup.nodes.Document;
 
 public class FetchProductListingFromSearch {
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 
 		Iterator<String> results  = FetchSearch("6304Z").iterator();
 		while(results.hasNext()){
@@ -25,14 +25,15 @@ public class FetchProductListingFromSearch {
 			System.out.println(url);
             getProductInfo(url);
 		}
-	}
+	}*/
 	
 	/**
 	 * Collect the set of product info URLs found on simplybearings.co.uk from a single keyword.
 	 * 
 	 * TODO check number of results
+	 * @throws throws IOException 
 	 */
-	public static HashSet<String> FetchSearch(String keyword) {
+	public static HashSet<String> FetchSearch(String keyword) throws IOException {
 		URL url;
 	    InputStream is = null;
 	    BufferedReader br;
@@ -56,9 +57,9 @@ public class FetchProductListingFromSearch {
 	            }
 	        }
 	    } catch (MalformedURLException mue) {
-	         mue.printStackTrace();
+	         throw mue;
 	    } catch (IOException ioe) {
-	         ioe.printStackTrace();
+	    	throw ioe;
 	    } finally {
 	        try {
 	            if (is != null) is.close();
@@ -75,8 +76,9 @@ public class FetchProductListingFromSearch {
 	 * 
 	 * TODO Formatting is table based so check if extraction based on the table is possible to get something better
 	 * than the currently used hack.
+	 * @throws IOException 
 	 */
-	public static HashMap<String,String> getProductInfo(String url){
+	public static HashMap<String,String> getProductInfo(String url) throws IOException{
 		HashMap<String,String> results = new HashMap<String,String>();
 		
 
@@ -96,13 +98,13 @@ public class FetchProductListingFromSearch {
 	            	if(line.contains("Also Known As:")){
 	            		//contains Also Known As
 	            		
-	            		System.out.println("DESC_EN : "+ line.substring(0, line.indexOf("Also Known As:")));
+	            		//System.out.println("DESC_EN : "+ line.substring(0, line.indexOf("Also Known As:")));
 	            		results.put("DESC_EN", line.substring(0, line.indexOf("Also Known As:")));
-	            		System.out.println("AlsoKnownAs : "+ line.substring(line.indexOf("Also Known As:")+16));
+	            		//System.out.println("AlsoKnownAs : "+ line.substring(line.indexOf("Also Known As:")+16));
 	            		results.put("AlsoKnownAs", line.substring(line.indexOf("Also Known As:")+16));
 	            	}else{
 	            		//only contains title so remainder of line should be the title/description
-	            		System.out.println("DESC_EN : "+ line);
+	            		//System.out.println("DESC_EN : "+ line);
 	            		results.put("DESC_EN", line);
 	            	}
 	            		
@@ -114,7 +116,7 @@ public class FetchProductListingFromSearch {
 	            	br.readLine();
 	            	line= br.readLine();
 	            	String attributeValue = Jsoup.parse(line).text();
-	            	System.out.println(attributeName+" : "+ attributeValue);
+	            	//System.out.println(attributeName+" : "+ attributeValue);
 	            	results.put(attributeName, attributeValue);
 	            }
 	            else if(line.contains("<td class=\"main\"><table border=\"0\" cellspacing=\"1\" cellpadding=\"2\">")){
@@ -129,15 +131,15 @@ public class FetchProductListingFromSearch {
 	            		line = br.readLine();
 	            		line = br.readLine();
 	            		line = br.readLine();
-	            		System.out.println(attributeName+" : "+ attributeValue);
+	            		//System.out.println(attributeName+" : "+ attributeValue);
 	            		results.put(attributeName, attributeValue);
 	            	}
 	            }
 	        }
 	    } catch (MalformedURLException mue) {
-	         mue.printStackTrace();
+	         throw mue;
 	    } catch (IOException ioe) {
-	         ioe.printStackTrace();
+	         throw ioe;
 	    } finally {
 	        try {
 	            if (is != null) is.close();
