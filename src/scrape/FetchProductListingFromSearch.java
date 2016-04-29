@@ -111,11 +111,11 @@ public class FetchProductListingFromSearch {
 	            }
 	            else if(line.contains("productDataTable-Cell-key")){
 	            	//technical data
-	            	String attributeName = Jsoup.parse(line).text();
+	            	String attributeName = Jsoup.parse(line).text().replace("\u00a0", "");
 	            	//read 2 lines to get data value
 	            	br.readLine();
 	            	line= br.readLine();
-	            	String attributeValue = Jsoup.parse(line).text();
+	            	String attributeValue = Jsoup.parse(line).text().replace("\u00a0", "");
 	            	//System.out.println(attributeName+" : "+ attributeValue);
 	            	results.put(attributeName, attributeValue);
 	            }
@@ -124,10 +124,10 @@ public class FetchProductListingFromSearch {
 	            	line = br.readLine(); //read <tr>
 	            	while (line.contains("<tr>")){
 	            		line = br.readLine();
-	            		String attributeName = Jsoup.parse(line).text();
+	            		String attributeName = Jsoup.parse(line).text().replace("\u00a0", "");
 	            		attributeName = attributeName.substring(0, attributeName.length()-1); //consistently pickup : at the end of each general product information.
 	            		line = br.readLine();
-	            		String attributeValue = Jsoup.parse(line).text();
+	            		String attributeValue = Jsoup.parse(line).text().replace("\u00a0", "");
 	            		line = br.readLine();
 	            		line = br.readLine();
 	            		line = br.readLine();
@@ -174,6 +174,7 @@ public class FetchProductListingFromSearch {
 				case "WidthB" : key = "Width"; break;
 				case "WidthW" : key = "Width"; break;
 				case "kg" : key = "Weight"; break;
+				default: break;
 			}
 			String value = result.getValue();
 			String valueAlpha = result.getValue().replaceAll("[^A-Za-z]", "");
@@ -183,6 +184,7 @@ public class FetchProductListingFromSearch {
 			case "rpm" : value = value.replaceAll("[A-Za-z ]", ""); key = key + " | " + "rpm"; break;
 			case "kg" : value = value.replaceAll("[A-Za-z ]", ""); key = key + " | " + "Kg"; break;
 			case "g" : value = Double.toString((Double.parseDouble(value.replaceAll("[A-Za-z ]", ""))/1000)); key = key + " | " + "Kg"; break;
+			default: break;
 			}
 			if(valueAlpha.isEmpty()){
 			switch (key){
@@ -190,6 +192,7 @@ public class FetchProductListingFromSearch {
 			case "Inside Diameter" : key = "Inside Diameter | mm"; break;
 			case "Outside Diameter" : key = "Outside Diameter | mm"; break;
 			case "Width" : key = "Width | mm"; break;
+			default: break;
 			}}
 			//initial cleaning done attempt to add but check for conflict
 			if(cleanedResultMap.get(key)==null){
