@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -121,6 +123,7 @@ public class FetchProductListingFromSearch {
 	            	while (line.contains("<tr>")){
 	            		line = br.readLine();
 	            		String attributeName = Jsoup.parse(line).text();
+	            		attributeName = attributeName.substring(0, attributeName.length()-1); //consistently pickup : at the end of each general product information.
 	            		line = br.readLine();
 	            		String attributeValue = Jsoup.parse(line).text();
 	            		line = br.readLine();
@@ -143,6 +146,63 @@ public class FetchProductListingFromSearch {
 	        }
 	    }
 	    return results;
+	}
+	
+	/**
+	 * Does an initial pass over results from getProductInfo
+	 * Will rename fields and group identical fields together.
+	 * @param resultSet
+	 * @return
+	 * @throws Exception Thrown when conflicts within the same resultMap is found.
+	 */
+	public static HashMap<String,String> initialClean(HashMap<String,String> resultMap) throws Exception{
+		HashMap<String,String> cleanedResultMap = new HashMap<String,String>();
+		Iterator<Entry<String, String>> resultSet = resultMap.entrySet().iterator();
+		while(resultSet.hasNext()){
+			Entry<String, String> result = resultSet.next();
+			String key = result.getKey();
+			switch (key){
+				case "DESC_EN" : key = "DESC2_EN"; break;
+				case "d" : key = "Inside Diameter"; break;
+				case "Inside Dia d" : key = "Inside Diameter"; break;
+				case "Inside Diameter d" : key = "Inside Diameter"; break;
+				case "D" : key = "Outside Diameter"; break;
+				case "Outside Diameter D" : key = "Outside Diameter"; break;
+				case "B" : key = "Width"; break;
+				case "Width B" : key = "Width"; break;
+				case "Width W" : key = "Width"; break;
+				case "kg" : key = "Weight"; break;
+			}
+			String value = result.getValue();
+			String valueAlpha = result.getValue().replaceAll("[^A-Za-z]", "");
+			switch (valueAlpha.toLowerCase()){
+			case "mm" : value = value.replaceAll("[A-Za-z ]", ""); key = key + " | " + "mm"; break;
+			case "kn" : value = value.replaceAll("[A-Za-z ]", ""); key = key + " | " + "kN"; break;
+			case "rpm" : value = value.replaceAll("[A-Za-z ]", ""); key = key + " | " + "rpm"; break;
+			case "kg" : value = value.replaceAll("[A-Za-z ]", ""); key = key + " | " + "Kg"; break;
+			case "g" : value = Double.toString((Double.parseDouble(value.replaceAll("[A-Za-z ]", ""))/1000)); key = key + " | " + "Kg"; break;
+			}
+			if(valueAlpha.isEmpty()){
+			switch (key){
+			//mm is default value
+			case "Inside Diameter" : key = "Inside Diameter | mm"; break;
+			case "Outside Diameter" : key = "Outside Diameter | mm"; break;
+			case "Width" : key = "Width | mm"; break;
+			}}
+			//initial cleaning done attempt to add but check for conflict
+			if(cleanedResultMap.get(key)==null){
+				//key does not exist yet so add to map
+				cleanedResultMap.put(key, value);
+			}
+				
+			else if (!cleanedResultMap.get(key).equals(value)){
+				//key exists but conflicts
+				throw new Exception("Data Conflict: From resultMap with description "+resultMap.get("DESC_EN")+"\n"
+						+ " key "+key+" expected value "+cleanedResultMap.get(key)+" but got "+ value);
+			}
+			//remaining else would be key exists but no conflict so ok.
+		}
+		return cleanedResultMap;
 	}
 	
 }
