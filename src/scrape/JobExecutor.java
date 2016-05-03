@@ -10,13 +10,13 @@ import java.util.Iterator;
 
 import org.json.simple.JSONObject;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import support.NewFileWriter;
-
+import support.SupportFileReader;
+/**
+ * 
+ * TODO Multithread?
+ */
 public class JobExecutor {
 
 	public static void main(String[] args) {
@@ -25,7 +25,7 @@ public class JobExecutor {
 		}
 	}
 	
-	public static void executeJob(int jobID, String searchTerm){
+	private static void executeJob(int jobID, String searchTerm){
 		HashMap<String,Object> resultMap = new HashMap<String, Object>();
 		String contentBlock = " ";
 		
@@ -51,7 +51,7 @@ public class JobExecutor {
 			individualResultMap.put("status", "success");
 			try{
 				HashMap<String,String> cleanedHashMap = FetchProductListingFromSearch.initialClean(FetchProductListingFromSearch.getProductInfo(url));
-				NewFileWriter.writeFile(prettyJSON(JSONObject.toJSONString(individualResultMap))+"\n--\n"+prettyJSON(JSONObject.toJSONString(cleanedHashMap)), ""+jobID+"-"+i+".txt");
+				NewFileWriter.writeFile(SupportFileReader.prettyJSON(JSONObject.toJSONString(individualResultMap))+"\n--\n"+SupportFileReader.prettyJSON(JSONObject.toJSONString(cleanedHashMap)), ""+jobID+"-"+i+".job");
 				individualResults.add(""+jobID+"-"+i);
 
 			}catch (Exception e) {
@@ -61,7 +61,7 @@ public class JobExecutor {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
-				NewFileWriter.writeFile(prettyJSON(JSONObject.toJSONString(individualResultMap))+"\n--\n"+e.toString()+"\n"+sw.toString(), ""+jobID+"-"+i+".txt");
+				NewFileWriter.writeFile(SupportFileReader.prettyJSON(JSONObject.toJSONString(individualResultMap))+"\n--\n"+e.toString()+"\n"+sw.toString(), ""+jobID+"-"+i+".job");
 	        }
 			
 		}
@@ -72,14 +72,9 @@ public class JobExecutor {
 			e.printStackTrace(pw);
 			contentBlock = contentBlock+e.toString()+"\n"+sw.toString();
         }
-		NewFileWriter.writeFile(prettyJSON(JSONObject.toJSONString(resultMap))+"\n--\n"+contentBlock, ""+jobID+".txt");
+		NewFileWriter.writeFile(SupportFileReader.prettyJSON(JSONObject.toJSONString(resultMap))+"\n--\n"+contentBlock, ""+jobID+".job");
 	}
 
-	public static String prettyJSON(String jsonString){
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		JsonParser jp = new JsonParser();
-		JsonElement je = jp.parse(jsonString);
-		return gson.toJson(je);
-	}
+	
 	
 }
