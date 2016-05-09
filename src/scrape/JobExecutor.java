@@ -65,7 +65,7 @@ public class JobExecutor {
 	        }
 			
 		}
-		}catch (IOException e) {
+		}catch (Exception e) {
 			resultMap.put("status", "failure");
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);

@@ -31,16 +31,73 @@ public class FetchProductListingFromSearch {
 	 * Collect the set of product info URLs found on simplybearings.co.uk from a single keyword.
 	 * 
 	 * TODO check number of results
+	 * @throws Exception 
 	 * @throws throws IOException 
 	 */
-	public static HashSet<String> FetchSearch(String keyword) throws IOException {
+	public static HashSet<String> FetchSearch(String keyword) throws Exception {
+		URL url;
+	    InputStream is = null;
+	    BufferedReader br;
+	    String line;
+	    HashSet<String> foundURLs = new HashSet<String>();
+	    int totalNumber = 0;
+	    try {
+	        url = new URL("http://simplybearings.co.uk/shop/product_listing_search_ajax.php?dd_data=&keywords="+keyword);
+	        is = url.openStream();  // throws an IOException
+	        br = new BufferedReader(new InputStreamReader(is));
+	        while ((line = br.readLine()) != null) {
+	            if(line.contains("product_info.html")){
+	            	line = line.replace('"', ' ');
+	            	String[] words = line.split(" ");
+	            	for(int i=0;i<words.length;i++){
+	            		if (words[i].contains("product_info.html"))
+	            			//System.out.println(words[i]);
+	            			foundURLs.add(words[i]);
+	            			
+	            	}
+	            	
+	            }
+	            else if(Jsoup.parse(line).text().contains("Displaying 1 to")){
+	            	String[] splitLine = Jsoup.parse(line).text().split(" ");
+	            	totalNumber = (int) Double.parseDouble(splitLine[splitLine.length-2]);
+	            	int numberOfPages = (int) Math.ceil(totalNumber/25);
+	            	for(int j=2;j<=numberOfPages;j++){
+	            		foundURLs.addAll(FetchSearchExtra(keyword,j));
+	            	}
+	            }
+	        }
+	    } catch (MalformedURLException mue) {
+	         throw mue;
+	    } catch (IOException ioe) {
+	    	throw ioe;
+	    } finally {
+	        try {
+	            if (is != null) is.close();
+	        } catch (IOException ioe) {
+	            // nothing to see here
+	        }
+	    }
+	    if(totalNumber!=0&& totalNumber!=foundURLs.size()){
+	    	throw new Exception("Incorrect Number of Results: From search with keyword "+keyword+"\n"
+					+ " expected number of results "+totalNumber+" but got "+ foundURLs.size());
+	    }
+	    return foundURLs;
+	}
+	
+	/**
+	 * Collect the set of product info URLs found on simplybearings.co.uk from a single keyword on a specified page of the search results.
+	 * 
+	 * TODO check number of results
+	 * @throws throws IOException 
+	 */
+	public static HashSet<String> FetchSearchExtra(String keyword,int page) throws IOException {
 		URL url;
 	    InputStream is = null;
 	    BufferedReader br;
 	    String line;
 	    HashSet<String> foundURLs = new HashSet<String>();
 	    try {
-	        url = new URL("http://simplybearings.co.uk/shop/product_listing_search_ajax.php?dd_data=&keywords="+keyword);
+	        url = new URL("http://simplybearings.co.uk/shop/product_listing_search_ajax.php?dd_data=&keywords="+keyword+"&page="+page);
 	        is = url.openStream();  // throws an IOException
 	        br = new BufferedReader(new InputStreamReader(is));
 	        while ((line = br.readLine()) != null) {
