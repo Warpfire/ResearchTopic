@@ -25,10 +25,9 @@ public class JobExecutor {
 		}
 	}
 	
-	private static void executeJob(int jobID, String searchTerm){
+	protected static void executeJob(int jobID, String searchTerm){
 		HashMap<String,Object> resultMap = new HashMap<String, Object>();
 		String contentBlock = " ";
-		
 		resultMap.put("serial", jobID);
 		resultMap.put("status", "success");
 		resultMap.put("id", searchTerm);
