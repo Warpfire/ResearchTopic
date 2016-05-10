@@ -60,7 +60,7 @@ public class FetchProductListingFromSearch {
 	            else if(Jsoup.parse(line).text().contains("Displaying 1 to")){
 	            	String[] splitLine = Jsoup.parse(line).text().split(" ");
 	            	totalNumber = (int) Double.parseDouble(splitLine[splitLine.length-2]);
-	            	int numberOfPages = (int) Math.ceil(totalNumber/25);
+	            	int numberOfPages = (int) Math.ceil(totalNumber/25.0);
 	            	for(int j=2;j<=numberOfPages;j++){
 	            		foundURLs.addAll(FetchSearchExtra(keyword,j));
 	            	}
