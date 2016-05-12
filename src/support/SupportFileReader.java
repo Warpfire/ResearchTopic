@@ -96,6 +96,7 @@ public class SupportFileReader {
 		    String line = br.readLine();
 		    while (line != null) {
 		    	resultList.add((HashMap) parser.parse(line));
+		    	resultList.get(resultList.size()-1).put("id", Long.toString((long) resultList.get(resultList.size()-1).get("id")));
 		        line = br.readLine();
 		    }
 		} catch (FileNotFoundException e) {
