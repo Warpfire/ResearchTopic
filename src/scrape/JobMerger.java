@@ -1,9 +1,12 @@
 package scrape;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.simple.JSONObject;
 
@@ -43,20 +46,60 @@ public class JobMerger {
 				if(entry==null){
 					entry = new HashMap();
 					entry.put("data", SupportFileReader.readDataFromJob(searchResults.get(j).toString()+".job"));
-					ArrayList<String> _job_id = new ArrayList<String>();
-					_job_id.add(((HashMap) header.get("job")).get("id").toString());	
-					ArrayList<String> _job_serial = new ArrayList<String>();
-					_job_serial.add(((HashMap) header.get("job")).get("serial").toString());
-					entry.put("_job_id", _job_id);
-					entry.put("_job_serial", _job_serial);
+					entry.put("_job_id", Arrays.asList(((HashMap) header.get("job")).get("id").toString()));
+					entry.put("_job_serial", Arrays.asList(((HashMap) header.get("job")).get("serial").toString()));
 					compileMatches.put(url, entry);
 				}
 				else{
-					((ArrayList)entry.get("_job_id")).add(((HashMap) header.get("job")).get("id").toString());
-					((ArrayList)entry.get("_job_serial")).add(((HashMap) header.get("job")).get("serial").toString());
+					((List)entry.get("_job_id")).add(((HashMap) header.get("job")).get("id").toString());
+					((List)entry.get("_job_serial")).add(((HashMap) header.get("job")).get("serial").toString());
 				}
 			}}
 		}
+		
+		
+		
+		//System.out.println(SupportFileReader.prettyJSON(JSONObject.toJSONString(compileMatches)));
+		formatPrintCompiledJobs(compileMatches);
+	}
+	
+	
+	protected static void compileJobsWithDataset(String[] jobSerials){
+		HashMap compileMatches = new HashMap();
+		for(int i=0; i<jobSerials.length;i++){
+			ArrayList searchResults = (ArrayList)SupportFileReader.readHeaderFromJob(jobSerials[i]+".job").get("results");
+			for(int j=0;j<searchResults.size();j++){
+				if(!searchResults.get(j).toString().contains(" X")){ //only read successful jobs. Failures are marked with " X".
+				HashMap header =SupportFileReader.readHeaderFromJob(searchResults.get(j).toString()+".job");
+				String url = header.get("url").toString();
+				HashMap entry = (HashMap) compileMatches.get(url);
+				if(entry==null){
+					entry = new HashMap();
+					entry.put("data", SupportFileReader.readDataFromJob(searchResults.get(j).toString()+".job"));
+					entry.put("_job_id", Arrays.asList(((HashMap) header.get("job")).get("id").toString()));
+					entry.put("_job_serial", Arrays.asList(((HashMap) header.get("job")).get("serial").toString()));
+					compileMatches.put(url, entry);
+				}
+				else{
+					//new match might contain match with initial dataset, as might the already exisiting entry.
+					Iterator<Entry<String, String>> toAdd = SupportFileReader.readDataFromJob(searchResults.get(j).toString()+".job").entrySet().iterator();
+					while(toAdd.hasNext()){
+						Entry<String, String> entryAdd = toAdd.next();
+						if(!entry.containsKey(entryAdd.getKey())){
+							entry.put(entryAdd.getKey(), Arrays.asList(entryAdd.getValue()));
+						}
+						else{
+							((List)entry.get(entryAdd.getKey())).add(entryAdd.getValue());
+							System.out.println("entry Already existed so added "+entryAdd.toString()+" as "+entry.get(entryAdd.getKey()));
+						}
+					}
+					((List)entry.get("_job_id")).add(((HashMap) header.get("job")).get("id").toString());
+					((List)entry.get("_job_serial")).add(((HashMap) header.get("job")).get("serial").toString());
+				}
+			}}
+		}
+		
+		
 		
 		//System.out.println(SupportFileReader.prettyJSON(JSONObject.toJSONString(compileMatches)));
 		formatPrintCompiledJobs(compileMatches);
@@ -71,7 +114,7 @@ public class JobMerger {
 			HashMap json = (HashMap) ((HashMap) entry.getValue()).get("data");
 					json.put("_job_serial", ((HashMap) entry.getValue()).get("_job_serial"));
 					json.put("_job_id", ((HashMap) entry.getValue()).get("_job_id"));
-					json.put("_url", entry.getKey());
+					json.put("_url", Arrays.asList(entry.getKey()));
 					json.put("_trackingID", ""+trackingNumber);
 					trackingNumber++;
 			FileAppender.appendToFile(SupportFileReader.prettyJSON(JSONObject.toJSONString(json)), "compiledJobs.json");
@@ -82,8 +125,8 @@ public class JobMerger {
 			HashMap json = (HashMap) ((HashMap) entry.getValue()).get("data");
 					json.put("_job_serial", ((HashMap) entry.getValue()).get("_job_serial"));
 					json.put("_job_id", ((HashMap) entry.getValue()).get("_job_id"));
-					json.put("_url", entry.getKey());
-					json.put("_trackingID", ""+trackingNumber);
+					json.put("_url", Arrays.asList(entry.getKey()));
+					json.put("_trackingID", Arrays.asList(""+trackingNumber));
 					trackingNumber++;
 					FileAppender.appendToFile(",\n", "compiledJobs.json");
 					FileAppender.appendToFile(SupportFileReader.prettyJSON(JSONObject.toJSONString(json)), "compiledJobs.json");

@@ -6,9 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -30,7 +33,7 @@ public class FetchProductListingFromSearch {
 	/**
 	 * Collect the set of product info URLs found on simplybearings.co.uk from a single keyword.
 	 * 
-	 * TODO check number of results
+	 * 
 	 * @throws Exception 
 	 * @throws throws IOException 
 	 */
@@ -90,7 +93,7 @@ public class FetchProductListingFromSearch {
 	 * TODO check number of results
 	 * @throws throws IOException 
 	 */
-	public static HashSet<String> FetchSearchExtra(String keyword,int page) throws IOException {
+	private static HashSet<String> FetchSearchExtra(String keyword,int page) throws IOException {
 		URL url;
 	    InputStream is = null;
 	    BufferedReader br;
@@ -135,8 +138,8 @@ public class FetchProductListingFromSearch {
 	 * than the currently used hack.
 	 * @throws IOException 
 	 */
-	public static HashMap<String,String> getProductInfo(String url) throws IOException{
-		HashMap<String,String> results = new HashMap<String,String>();
+	public static HashMap<String,List<String>> getProductInfo(String url) throws IOException{
+		HashMap<String,List<String>> results = new HashMap<String,List<String>>();
 		
 
 	    InputStream is = null;
@@ -156,13 +159,13 @@ public class FetchProductListingFromSearch {
 	            		//contains Also Known As
 	            		
 	            		//System.out.println("DESC_EN : "+ line.substring(0, line.indexOf("Also Known As:")));
-	            		results.put("DESC_EN", line.substring(0, line.indexOf("Also Known As:")));
+	            		results.put("DESC_EN", Arrays.asList(line.substring(0, line.indexOf("Also Known As:"))));
 	            		//System.out.println("AlsoKnownAs : "+ line.substring(line.indexOf("Also Known As:")+16));
-	            		results.put("AlsoKnownAs", line.substring(line.indexOf("Also Known As:")+16));
+	            		results.put("AlsoKnownAs", Arrays.asList(line.substring(line.indexOf("Also Known As:")+16).split(" ")));
 	            	}else{
 	            		//only contains title so remainder of line should be the title/description
 	            		//System.out.println("DESC_EN : "+ line);
-	            		results.put("DESC_EN", line);
+	            		results.put("DESC_EN",Arrays.asList(line) );
 	            	}
 	            		
 	            }
@@ -174,7 +177,7 @@ public class FetchProductListingFromSearch {
 	            	line= br.readLine();
 	            	String attributeValue = Jsoup.parse(line).text().replace("\u00a0", "");
 	            	//System.out.println(attributeName+" : "+ attributeValue);
-	            	results.put(attributeName, attributeValue);
+	            	results.put(attributeName, Arrays.asList(attributeValue));
 	            }
 	            else if(line.contains("<td class=\"main\"><table border=\"0\" cellspacing=\"1\" cellpadding=\"2\">")){
 	            	//general product information
@@ -189,7 +192,7 @@ public class FetchProductListingFromSearch {
 	            		line = br.readLine();
 	            		line = br.readLine();
 	            		//System.out.println(attributeName+" : "+ attributeValue);
-	            		results.put(attributeName, attributeValue);
+	            		results.put(attributeName, Arrays.asList(attributeValue));
 	            	}
 	            }
 	        }
@@ -214,11 +217,11 @@ public class FetchProductListingFromSearch {
 	 * @return
 	 * @throws Exception Thrown when conflicts within the same resultMap is found.
 	 */
-	public static HashMap<String,String> initialClean(HashMap<String,String> resultMap) throws Exception{
-		HashMap<String,String> cleanedResultMap = new HashMap<String,String>();
-		Iterator<Entry<String, String>> resultSet = resultMap.entrySet().iterator();
+	public static HashMap<String,List<String>> initialClean(HashMap<String,List<String>> resultMap) throws Exception{
+		HashMap<String,List<String>> cleanedResultMap = new HashMap<String,List<String>>();
+		Iterator<Entry<String, List<String>>> resultSet = resultMap.entrySet().iterator();
 		while(resultSet.hasNext()){
-			Entry<String, String> result = resultSet.next();
+			Entry<String, List<String>> result = resultSet.next();
 			String key = result.getKey();
 			switch (key.replaceAll("\\s","")){
 				case "DESC_EN" : key = "DESC2_EN"; break;
@@ -233,8 +236,8 @@ public class FetchProductListingFromSearch {
 				case "kg" : key = "Weight"; break;
 				default: break;
 			}
-			String value = result.getValue();
-			String valueAlpha = result.getValue().replaceAll("[^A-Za-z]", "");
+			String value = result.getValue().get(0);
+			String valueAlpha = result.getValue().get(0).replaceAll("[^A-Za-z]", "");
 			switch (valueAlpha.toLowerCase()){
 			case "mm" : value = value.replaceAll("[A-Za-z ]", ""); key = key + " | " + "mm"; break;
 			case "kn" : value = value.replaceAll("[A-Za-z ]", ""); key = key + " | " + "kN"; break;
@@ -254,13 +257,19 @@ public class FetchProductListingFromSearch {
 			//initial cleaning done attempt to add but check for conflict
 			if(cleanedResultMap.get(key)==null){
 				//key does not exist yet so add to map
-				cleanedResultMap.put(key, value);
+				
+				if(result.getValue().size()>1){
+					cleanedResultMap.put(key,result.getValue());//only AlsoKnownAs generates an actual array with multiple values but they do need to be kept
+				}
+				else{
+					cleanedResultMap.put(key, Arrays.asList(value));
+				}
 			}
 				
-			else if (!cleanedResultMap.get(key).equals(value)){
+			else if (!cleanedResultMap.get(key).get(0).equals(value)){
 				//key exists but conflicts
 				throw new Exception("Data Conflict: From resultMap with description "+resultMap.get("DESC_EN")+"\n"
-						+ " key "+key+" expected value "+cleanedResultMap.get(key)+" but got "+ value);
+						+ " key "+key+" expected value "+cleanedResultMap.get(key).get(0)+" but got "+ value);
 			}
 			//remaining else would be key exists but no conflict so ok.
 		}

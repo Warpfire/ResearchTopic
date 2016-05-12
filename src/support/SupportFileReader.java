@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -83,6 +85,31 @@ public class SupportFileReader {
 			e.printStackTrace();
 		}
 		return returnValue;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static List<HashMap> readJsonFromDataset(String filename){
+		List<HashMap> resultList = new ArrayList();
+		JSONParser parser = new JSONParser();
+		try(BufferedReader br = new BufferedReader(new FileReader("C:\\Temp\\"+filename))) {
+		    
+		    String line = br.readLine();
+		    while (line != null) {
+		    	resultList.add((HashMap) parser.parse(line));
+		        line = br.readLine();
+		    }
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return resultList;
 	}
 	
 	public static String prettyJSON(String jsonString){
