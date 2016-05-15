@@ -10,15 +10,41 @@ import support.SupportFileReader;
 
 public class ProductMatching {
 
+	private static final int WORKER_NUMBER = 4;
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 	
 			List dataEntries = SupportFileReader.readJsonFromDataset(args[0]);
+			
 			String[] jobs = new String[dataEntries.size()];
+			
+			if(args[1].equals("threaded")){
+			
+				Thread[] workers= new Thread[WORKER_NUMBER];
+			for(int i=0;i<WORKER_NUMBER;i++){
+				Thread T1 = new Thread(new JobExecutorRunnable(dataEntries.subList(((int)Math.floor(i*(dataEntries.size()/4.0))),((int)Math.floor((i+1)*(dataEntries.size()/4.0)))),((int)Math.floor(i*(dataEntries.size()/4.0)))));
+			      T1.start();
+			      workers[i]=T1;
+			}
+			for(int i =0; i<dataEntries.size();i++){
+				jobs[i]=""+(i+1);
+			
+			}
+			for(int i = 0; i<WORKER_NUMBER;i++){
+				try {
+					workers[i].join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			}
+			else{
 			for(int i =0; i<dataEntries.size();i++){
 				JobExecutor.executeJobUsingDataset(i+1, (HashMap<String, String>) dataEntries.get(i));
 				jobs[i]=""+(i+1);
-			}
+			}}
 			JobMerger.compileJobsWithDataset(jobs);
 		
 		//System.out.println(matchToDataFile(SupportFileReader.readDataFromJob("1-2.job"),SupportFileReader.readJsonFromDataset("deep-groove-ball-bearing.json").get(0)));
