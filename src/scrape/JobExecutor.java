@@ -77,6 +77,11 @@ public class JobExecutor {
 		NewFileWriter.writeFile(SupportFileReader.prettyJSON(JSONObject.toJSONString(resultMap))+"\n--\n"+contentBlock, ""+jobID+".job");
 	}
 	
+	/**
+	 * 
+	 * @param jobID
+	 * @param dataSet
+	 */
 	public static void executeJobUsingDataset(int jobID, HashMap<String,String> dataSet){
 		HashMap<String,Object> resultMap = new HashMap<String, Object>();
 		String contentBlock = " ";

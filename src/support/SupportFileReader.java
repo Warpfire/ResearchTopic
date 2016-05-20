@@ -113,6 +113,36 @@ public class SupportFileReader {
 		return resultList;
 	}
 	
+	@SuppressWarnings("rawtypes")
+	public static List readcompiledJobs(String filename){
+		StringBuilder sb = new StringBuilder();
+		try(BufferedReader br = new BufferedReader(new FileReader("C:\\Temp\\"+filename))) {
+		    
+		    String line = br.readLine();
+
+		    while (line != null) {
+		        sb.append(line);
+		        line = br.readLine();
+		    }
+		    String everything = sb.toString();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JSONParser parser = new JSONParser();
+		List returnValue = null;
+		try {
+			returnValue = (List) parser.parse(sb.toString());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return returnValue;
+	}
+	
 	public static String prettyJSON(String jsonString){
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		JsonParser jp = new JsonParser();

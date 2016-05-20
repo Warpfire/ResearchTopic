@@ -45,7 +45,7 @@ public class FetchProductListingFromSearch {
 	    HashSet<String> foundURLs = new HashSet<String>();
 	    int totalNumber = 0;
 	    try {
-	        url = new URL("http://simplybearings.co.uk/shop/product_listing_search_ajax.php?dd_data=&keywords="+keyword);
+	        url = new URL("http://simplybearings.co.uk/shop/product_listing_search_ajax.php?dd_data=&keywords="+keyword.replaceAll("\\W", " ").replaceAll(" +", "+"));
 	        is = url.openStream();  // throws an IOException
 	        br = new BufferedReader(new InputStreamReader(is));
 	        while ((line = br.readLine()) != null) {
@@ -100,7 +100,7 @@ public class FetchProductListingFromSearch {
 	    String line;
 	    HashSet<String> foundURLs = new HashSet<String>();
 	    try {
-	        url = new URL("http://simplybearings.co.uk/shop/product_listing_search_ajax.php?dd_data=&keywords="+keyword+"&page="+page);
+	        url = new URL("http://simplybearings.co.uk/shop/product_listing_search_ajax.php?dd_data=&keywords="+keyword.replaceAll("\\W", " ").replaceAll(" +", "+")+"&page="+page);
 	        is = url.openStream();  // throws an IOException
 	        br = new BufferedReader(new InputStreamReader(is));
 	        while ((line = br.readLine()) != null) {
@@ -159,13 +159,13 @@ public class FetchProductListingFromSearch {
 	            		//contains Also Known As
 	            		
 	            		//System.out.println("DESC_EN : "+ line.substring(0, line.indexOf("Also Known As:")));
-	            		results.put("DESC_EN", Arrays.asList(line.substring(0, line.indexOf("Also Known As:"))));
+	            		results.put("DESC_EN", new ArrayList(Arrays.asList(line.substring(0, line.indexOf("Also Known As:")))));
 	            		//System.out.println("AlsoKnownAs : "+ line.substring(line.indexOf("Also Known As:")+16));
-	            		results.put("AlsoKnownAs", Arrays.asList(line.substring(line.indexOf("Also Known As:")+16).split(" ")));
+	            		results.put("AlsoKnownAs", new ArrayList(Arrays.asList(line.substring(line.indexOf("Also Known As:")+16).split(" "))));
 	            	}else{
 	            		//only contains title so remainder of line should be the title/description
 	            		//System.out.println("DESC_EN : "+ line);
-	            		results.put("DESC_EN",Arrays.asList(line) );
+	            		results.put("DESC_EN",new ArrayList(Arrays.asList(line) ));
 	            	}
 	            		
 	            }
@@ -177,7 +177,7 @@ public class FetchProductListingFromSearch {
 	            	line= br.readLine();
 	            	String attributeValue = Jsoup.parse(line).text().replace("\u00a0", "");
 	            	//System.out.println(attributeName+" : "+ attributeValue);
-	            	results.put(attributeName, Arrays.asList(attributeValue));
+	            	results.put(attributeName, new ArrayList(Arrays.asList(attributeValue)));
 	            }
 	            else if(line.contains("<td class=\"main\"><table border=\"0\" cellspacing=\"1\" cellpadding=\"2\">")){
 	            	//general product information
@@ -192,7 +192,7 @@ public class FetchProductListingFromSearch {
 	            		line = br.readLine();
 	            		line = br.readLine();
 	            		//System.out.println(attributeName+" : "+ attributeValue);
-	            		results.put(attributeName, Arrays.asList(attributeValue));
+	            		results.put(attributeName, new ArrayList(Arrays.asList(attributeValue)));
 	            	}
 	            }
 	        }
@@ -262,7 +262,7 @@ public class FetchProductListingFromSearch {
 					cleanedResultMap.put(key,result.getValue());//only AlsoKnownAs generates an actual array with multiple values but they do need to be kept
 				}
 				else{
-					cleanedResultMap.put(key, Arrays.asList(value));
+					cleanedResultMap.put(key, new ArrayList(Arrays.asList(value)));
 				}
 			}
 				
