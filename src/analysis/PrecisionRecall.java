@@ -24,13 +24,14 @@ public class PrecisionRecall {
 		while(entriesIterator.hasNext()){
 			HashMap<String,List<String>> entry = (HashMap<String, List<String>>) entriesIterator.next();
 			if(entry.get("Type/Dimension | EF001139")!=null){
-				if(matchesCount.containsKey(entry.get("Type/Dimension | EF001139").get(0))){
-					matchesCount.put(entry.get("Type/Dimension | EF001139").get(0), matchesCount.get(entry.get("Type/Dimension | EF001139").get(0))+1);
+				for(int i=0;i<entry.get("Type/Dimension | EF001139").size();i++){
+				if(matchesCount.containsKey(entry.get("Type/Dimension | EF001139").get(i))){
+					matchesCount.put(entry.get("Type/Dimension | EF001139").get(i), matchesCount.get(entry.get("Type/Dimension | EF001139").get(i))+1);
 				}
 				else{
-					matchesCount.put(entry.get("Type/Dimension | EF001139").get(0), 1);
+					matchesCount.put(entry.get("Type/Dimension | EF001139").get(i), 1);
 				}
-			}
+			}}
 		}
 		System.out.println(SupportFileReader.prettyJSON(JSONObject.toJSONString(matchesCount)));
 		Set<Integer> uniqueSet = new HashSet<Integer>(matchesCount.values());

@@ -26,6 +26,13 @@ public class JobMerger {
 			}
 			formatPrintCompiledJobs(compileJobs(jobs),"compiledJobs");
 		}
+		else if(args[0].equals("to")){
+			String[] jobs = new String[Integer.parseInt(args[1])];
+			for(int i =1; i<=Integer.parseInt(args[1]);i++){
+				jobs[i-1]=""+i;
+			}
+			formatPrintCompiledJobs(compileJobs(jobs),"compiledJobs");
+		}
 		else{
 			formatPrintCompiledJobs(compileJobs(args),"compiledJobs");}
 	}
@@ -48,7 +55,6 @@ public class JobMerger {
 				String url = header.get("url").toString();
 				HashMap entry = (HashMap) compileMatches.get(url);
 				if(entry==null){
-					System.out.println("Entry Null");
 					entry = new HashMap();
 					entry.put("data", SupportFileReader.readDataFromJob(searchResults.get(j).toString()+".job"));
 					entry.put("_job_id", new ArrayList(Arrays.asList(((HashMap) header.get("job")).get("id").toString())));
@@ -56,21 +62,20 @@ public class JobMerger {
 					compileMatches.put(url, entry);
 				}
 				else{
-					System.out.println("Entry Not Null");
 					//new match might contain match with initial dataset, as might the already exisiting entry.
-					Iterator<Entry<String, Object>> toAdd = SupportFileReader.readDataFromJob(searchResults.get(j).toString()+".job").entrySet().iterator();
+					Iterator<Entry<String, List<String>>> toAdd = SupportFileReader.readDataFromJob(searchResults.get(j).toString()+".job").entrySet().iterator();
 					while(toAdd.hasNext()){
-						Entry<String, Object> entryAdd = toAdd.next();
+						Entry<String, List<String>> entryAdd = toAdd.next();
 						if(!((HashMap) entry.get("data")).containsKey(entryAdd.getKey())){
-							((HashMap) entry.get("data")).put(entryAdd.getKey(), new ArrayList(Arrays.asList(entryAdd.getValue())));
+							((HashMap) entry.get("data")).put(entryAdd.getKey(), entryAdd.getValue());
 						}
 						else{
 							//Data entry exists but the new information contained in toAdd may be a new varation and not contained in the List.
 							//check this and if it is new add it to the entry.
-							if(!((List)((HashMap) entry.get("data")).get(entryAdd.getKey())).contains(((List)entryAdd.getValue()).get(0))){
+							if(!((List)((HashMap) entry.get("data")).get(entryAdd.getKey())).contains((entryAdd.getValue()).get(0))){
 								//we are only checking if the first entry of the list is unique because only AlsoKnownAs should be able to 
 								//get multiple entries at previous stages and this should match fully because this only comes from simplybearings.
-								((List)((HashMap) entry.get("data")).get(entryAdd.getKey())).add(((List)entryAdd.getValue()).get(0));
+								((List)((HashMap) entry.get("data")).get(entryAdd.getKey())).add((entryAdd.getValue()).get(0));
 								System.out.println("entry Already existed so added "+entryAdd.toString()+" as "+((HashMap) entry.get("data")).get(entryAdd.getKey()));
 							}
 							
