@@ -16,6 +16,15 @@ import support.SupportFileReader;
 
 public class JobMerger {
 
+/**
+ * Main method with which to execute the scraper and matcher program.
+ * Has 3 execution modes.
+ * If the first argument is "all" then it will use each string after "all" as a search term and execute the whole program.
+ * From search to match to merge.
+ * If the first argument is "to" then it will expect an integer as the second string. Using this integer it will merge all jobs from 1 to and including the parsed integer.
+ * if neither "all" or "to" are used then it will attempt to merge all .job files with the given names.
+ * @param args
+ */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		if(args[0].equals("all")){

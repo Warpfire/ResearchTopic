@@ -87,6 +87,11 @@ public class SupportFileReader {
 		return returnValue;
 	}
 	
+	/**
+	 * Method which from a given filename builds a list of maps.
+	 * @param filename A filename including extension which leads to a .json file containing an array of maps.
+	 * @return
+	 */
 	@SuppressWarnings("rawtypes")
 	public static List<HashMap> readJsonFromDataset(String filename){
 		List<HashMap> resultList = new ArrayList();
@@ -113,6 +118,11 @@ public class SupportFileReader {
 		return resultList;
 	}
 	
+	/**
+	 * 
+	 * @param filename A filename including extension which leads to a .json file containing an array.
+	 * @return The array contained in the file cast to a List.
+	 */
 	@SuppressWarnings("rawtypes")
 	public static List readcompiledJobs(String filename){
 		StringBuilder sb = new StringBuilder();
@@ -143,6 +153,11 @@ public class SupportFileReader {
 		return returnValue;
 	}
 	
+	/**
+	 * Method which takes a JSON string as input and returns a JSON string with formatting applied for readability.
+	 * @param jsonString A JSON String.
+	 * @return A JSON string with formatting applied.
+	 */
 	public static String prettyJSON(String jsonString){
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		JsonParser jp = new JsonParser();

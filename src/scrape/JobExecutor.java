@@ -28,6 +28,12 @@ public class JobExecutor {
 		}
 	}
 	
+	/**
+	 * Method which executes a search and initial clean based on a searchTerm.
+	 * The result is then stored in a number of files with a name based on JobID.
+	 * @param jobID
+	 * @param searchTerm
+	 */
 	public static void executeJob(int jobID, String searchTerm){
 		HashMap<String,Object> resultMap = new HashMap<String, Object>();
 		String contentBlock = " ";
@@ -78,9 +84,11 @@ public class JobExecutor {
 	}
 	
 	/**
-	 * 
+	 * Method which executes a search, initial clean and productMatch based on a searchTerm with the product matching being done using dataSet.
+	 * The result is then stored in a number of files with a name based on JobID.
 	 * @param jobID
-	 * @param dataSet
+	 * @param searchTerm
+	 * @param dataSet A Map containing a product upon which matching is to be attempted. It is expected that the searchTerm is based somewhat on contents of the dataSet.
 	 */
 	public static void executeJobUsingDataset(int jobID, HashMap<String,String> dataSet){
 		HashMap<String,Object> resultMap = new HashMap<String, Object>();

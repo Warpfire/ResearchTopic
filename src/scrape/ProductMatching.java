@@ -59,10 +59,11 @@ public class ProductMatching {
 	
 	
 	/**
-	 * Will attempt to match found entries with entries from the origonal dataset.
-	 * @param resultMap
-	 * @param dataSet
-	 * @return
+	 * Will attempt to match found entries with entries from the original dataset.
+	 * If a match is found will return a match with both search and original dataset entries merged togheter.
+	 * @param resultMap A Map containing a entry found via search
+	 * @param dataSet A Map containing the entry on which the search was based.
+	 * @return The resultMap with if a match was found the contents of dataset as well
 	 */
 	public static HashMap<String,List<String>> matchToDataFile(HashMap<String,List<String>> resultMap, HashMap<String,String> dataSet){
 		HashMap<String,List<String>> returnMap = resultMap;
@@ -87,6 +88,56 @@ public class ProductMatching {
 				System.out.println("potentialMatch"+resultMap.get("DESC2_EN")+" and "+dataSet.get("DESC_EN"));
 				if(resultMap.get("DESC2_EN").toString().replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", "").replaceAll("2", ""))||(resultMap.get("AlsoKnownAs")!=null&&resultMap.get("AlsoKnownAs").toString().replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "")))){
 					System.out.println("potentialMatch"+resultMap.get("DESC2_EN")+" and "+dataSet.get("DESC_EN")+" matched when filtering 2/-");
+					//name possibly matches as well
+					//for some reason a 2 is sometimes used instead of a -
+					Iterator<Entry<String, String>> toAdd = dataSet.entrySet().iterator();
+					while(toAdd.hasNext()){
+						Entry<String, String> entry = toAdd.next();
+						if(!returnMap.containsKey(entry.getKey())){
+							//System.out.println(entry.getKey());
+						returnMap.put(entry.getKey(), new ArrayList(Arrays.asList(entry.getValue())));
+						}
+						else{
+							System.out.println("entry Already existed? "+entry.toString()+" as "+resultMap.get(entry.getKey()));
+						}
+					}
+				}
+			}
+		}
+		return returnMap;
+	}
+
+	/**
+	 * Will attempt to match found entries with entries from the original dataset.
+	 * If a match is found will return a match with both search and original dataset entries merged togheter.
+	 * Will only match using Brand and ID("Type/Dimension | EF001139").
+	 * @param resultMap A Map containing a entry found via search
+	 * @param dataSet A Map containing the entry on which the search was based.
+	 * @return The resultMap with if a match was found the contents of dataset as well
+	 */
+	public static HashMap<String,List<String>> matchToDataFileBrandID(HashMap<String,List<String>> resultMap, HashMap<String,String> dataSet){
+		HashMap<String,List<String>> returnMap = resultMap;
+		if(resultMap.get("Brand").get(0).equals(dataSet.get("Brand | EGTF_0008"))){
+			//sizes and brand matches
+			if(resultMap.get("DESC2_EN").toString().replaceAll("[^A-Za-z0-9]", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", ""))||(resultMap.get("AlsoKnownAs")!=null&&resultMap.get("AlsoKnownAs").toString().replaceAll("[^A-Za-z0-9]", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", "")))){
+				//name possibly matches as well
+				//for some reason a 2 is sometimes used instead of a -
+				Iterator<Entry<String, String>> toAdd = dataSet.entrySet().iterator();
+				while(toAdd.hasNext()){
+					Entry<String, String> entry = toAdd.next();
+					if(!returnMap.containsKey(entry.getKey())){
+						//System.out.println(entry.getKey());
+					returnMap.put(entry.getKey(), new ArrayList(Arrays.asList(entry.getValue())));
+					}
+					else{
+						System.out.println("entry Already existed? "+entry.toString()+" as "+resultMap.get(entry.getKey()));
+					}
+				}
+			}
+			else{
+				System.out.println("potentialMatch"+resultMap.get("DESC2_EN")+" and "+dataSet.get("DESC_EN"));
+				if(resultMap.get("DESC2_EN").toString().replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", "").replaceAll("2", ""))||(resultMap.get("AlsoKnownAs")!=null&&resultMap.get("AlsoKnownAs").toString().replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "")))){
+					System.out.println(resultMap.get("DESC2_EN")+" and "+dataSet.get("DESC_EN")+" matched when filtering 2/-");
 					//name possibly matches as well
 					//for some reason a 2 is sometimes used instead of a -
 					Iterator<Entry<String, String>> toAdd = dataSet.entrySet().iterator();
