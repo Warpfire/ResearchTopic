@@ -69,8 +69,7 @@ public class ProductMatching {
 		HashMap<String,List<String>> returnMap = resultMap;
 		if(resultMap.get("Brand").get(0).equals(dataSet.get("Brand | EGTF_0008"))&&resultMap.get("Outside Diameter | mm").get(0).equals(dataSet.get("Outer diameter | EF000015"))&&resultMap.get("Width | mm").get(0).equals(dataSet.get("Width | EF000008"))&&resultMap.get("Inside Diameter | mm").get(0).equals(dataSet.get("Inner diameter | EF000065"))){
 			//sizes and brand matches
-			if(resultMap.get("DESC2_EN").toString().replaceAll("[^A-Za-z0-9]", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", ""))||(resultMap.get("AlsoKnownAs")!=null&&resultMap.get("AlsoKnownAs").toString().replaceAll("[^A-Za-z0-9]", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", "")))){
-				//name possibly matches as well
+			if(nameMatch(resultMap,dataSet)){
 				//for some reason a 2 is sometimes used instead of a -
 				Iterator<Entry<String, String>> toAdd = dataSet.entrySet().iterator();
 				while(toAdd.hasNext()){
@@ -86,7 +85,7 @@ public class ProductMatching {
 			}
 			else{
 				System.out.println("potentialMatch"+resultMap.get("DESC2_EN")+" and "+dataSet.get("DESC_EN"));
-				if(resultMap.get("DESC2_EN").toString().replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", "").replaceAll("2", ""))||(resultMap.get("AlsoKnownAs")!=null&&resultMap.get("AlsoKnownAs").toString().replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "").contains((dataSet.get("Type/Dimension | EF001139")).replaceAll("[^A-Za-z0-9]", "").replaceAll("2", "")))){
+				if(nameMatchFilter2(resultMap,dataSet)){
 					System.out.println("potentialMatch"+resultMap.get("DESC2_EN")+" and "+dataSet.get("DESC_EN")+" matched when filtering 2/-");
 					//name possibly matches as well
 					//for some reason a 2 is sometimes used instead of a -

@@ -17,9 +17,9 @@ public class PrecisionRecall {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		matchesCount(403,"compiledJobs.json");
-		SearchCount(403,"compiledJobs.json");
-		matchesCountJob(403,"compiledJobs.json");
+		matchesCount(Integer.parseInt(args[0]),"compiledJobs.json",Integer.parseInt(args[1]));
+		SearchCount(Integer.parseInt(args[0]),"compiledJobs.json",Integer.parseInt(args[1]));
+		matchesCountJob(Integer.parseInt(args[0]),"compiledJobs.json",Integer.parseInt(args[1]));
 	}
 	
 	/**
@@ -27,7 +27,7 @@ public class PrecisionRecall {
 	 * @param inputNumber
 	 * @param filename
 	 */
-	public static void matchesCount(int inputNumber,String filename){
+	public static void matchesCount(int inputNumber,String filename, int padTo){
 		Iterator entriesIterator = SupportFileReader.readcompiledJobs(filename).iterator();
 		HashMap<String,Integer> matchesCount = new HashMap<String,Integer>();
 		while(entriesIterator.hasNext()){
@@ -52,7 +52,7 @@ public class PrecisionRecall {
 			totalCount = totalCount + (temp *Collections.frequency(matchesCount.values(), temp));
 		}
 		
-		Statistics stats = new Statistics(collectionToArrayWithPadding(matchesCount.values(),0));
+		Statistics stats = new Statistics(collectionToArrayWithPadding(matchesCount.values(),padTo));
 		System.out.println(matchesCount.values().size()+" initial dataset entries has a match of the total "+inputNumber+" initial dataset entries.");
 		System.out.println(totalCount+" total matches found.");
 		System.out.println(stats.getSum()+" sum Type/Dimension | EF001139.");
@@ -67,7 +67,7 @@ public class PrecisionRecall {
 	 * @param inputNumber
 	 * @param filename
 	 */
-	public static void SearchCount(int inputNumber,String filename){
+	public static void SearchCount(int inputNumber,String filename,int padTo){
 		Iterator entriesIterator = SupportFileReader.readcompiledJobs(filename).iterator();
 		HashMap<String,Integer> matchesCount = new HashMap<String,Integer>();
 		while(entriesIterator.hasNext()){
@@ -92,7 +92,7 @@ public class PrecisionRecall {
 			totalCount = totalCount + (temp *Collections.frequency(matchesCount.values(), temp));
 		}
 		
-		Statistics stats = new Statistics(collectionToArrayWithPadding(matchesCount.values(),0));
+		Statistics stats = new Statistics(collectionToArrayWithPadding(matchesCount.values(),padTo));
 		System.out.println(matchesCount.values().size()+" initial dataset entries has a match of the total "+inputNumber+" initial dataset entries.");
 		System.out.println(totalCount+" total matches found.");
 		System.out.println(stats.getSum()+" sum _job_id.");
@@ -107,7 +107,7 @@ public class PrecisionRecall {
 	 * @param inputNumber
 	 * @param filename
 	 */
-	public static void matchesCountJob(int inputNumber,String filename){
+	public static void matchesCountJob(int inputNumber,String filename, int padTo){
 		Iterator entriesIterator = SupportFileReader.readcompiledJobs(filename).iterator();
 		HashMap<String,Integer> matchesCount = new HashMap<String,Integer>();
 		while(entriesIterator.hasNext()){
@@ -134,14 +134,14 @@ public class PrecisionRecall {
 			totalCount = totalCount + (temp *Collections.frequency(matchesCount.values(), temp));
 		}
 		
-		Statistics stats = new Statistics(collectionToArrayWithPadding(matchesCount.values(),0));
+		Statistics stats = new Statistics(collectionToArrayWithPadding(matchesCount.values(),padTo));
 		System.out.println(matchesCount.values().size()+" initial dataset entries has a match of the total "+inputNumber+" initial dataset entries.");
 		System.out.println(totalCount+" total matches found.");
 		System.out.println(stats.getSum()+" sum Matches.");
 		System.out.println(stats.getMean()+" mean Matches per Job");
-		System.out.println(stats.getVariance()+" Matches per Job.");
-		System.out.println(stats.getStdDev()+" Matches per Job.");
-		System.out.println(stats.getMedian()+" Matches per Job.");
+		System.out.println(stats.getVariance()+" Variance Matches per Job.");
+		System.out.println(stats.getStdDev()+" standard Deviation Matches per Job.");
+		System.out.println(stats.getMedian()+" Median Matches per Job.");
 	}
 	
 	
