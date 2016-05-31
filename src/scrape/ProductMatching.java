@@ -65,7 +65,7 @@ public class ProductMatching {
 	 * @param dataSet A Map containing the entry on which the search was based.
 	 * @return The resultMap with if a match was found the contents of dataset as well
 	 */
-	public static HashMap<String,List<String>> matchToDataFile(HashMap<String,List<String>> resultMap, HashMap<String,String> dataSet){
+	public static HashMap<String,List<String>> matchToDataFileD(HashMap<String,List<String>> resultMap, HashMap<String,String> dataSet){
 		HashMap<String,List<String>> returnMap = resultMap;
 		if(resultMap.get("Brand").get(0).equals(dataSet.get("Brand | EGTF_0008"))&&resultMap.get("Outside Diameter | mm").get(0).equals(dataSet.get("Outer diameter | EF000015"))&&resultMap.get("Width | mm").get(0).equals(dataSet.get("Width | EF000008"))&&resultMap.get("Inside Diameter | mm").get(0).equals(dataSet.get("Inner diameter | EF000065"))){
 			//sizes and brand matches
@@ -114,7 +114,7 @@ public class ProductMatching {
 	 * @param dataSet A Map containing the entry on which the search was based.
 	 * @return The resultMap with if a match was found the contents of dataset as well
 	 */
-	public static HashMap<String,List<String>> matchToDataFileBrandID(HashMap<String,List<String>> resultMap, HashMap<String,String> dataSet){
+	public static HashMap<String,List<String>> matchToDataFile(HashMap<String,List<String>> resultMap, HashMap<String,String> dataSet){
 		HashMap<String,List<String>> returnMap = resultMap;
 		if(resultMap.get("Brand").get(0).equals(dataSet.get("Brand | EGTF_0008"))){
 			//sizes and brand matches
